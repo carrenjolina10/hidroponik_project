@@ -17,19 +17,3 @@ yarn-error.log
 /.idea
 /.vscode
 
-@"
-# AI Model
-*.pth
-*.pth.zip
-
-# Python
-__pycache__/
-*.pyc
-.venv/
-venv/
-
-# Laravel
-vendor/
-node_modules/
-.env
-"@ | Out-File -Encoding utf8 .gitignore
