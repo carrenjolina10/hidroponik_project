@@ -1,6 +1,6 @@
 # 🌱 HIDROPONIK BAGUS
 
-**HIDROPONIK BAGUS** adalah sistem berbasis web yang mengintegrasikan **aplikasi monitoring hidroponik dengan teknologi Computer Vision berbasis YOLOv8** untuk membantu mengidentifikasi penyakit pada tanaman **lettuce (selada)**.
+**HIDROPONIK BAGUS (Biointelligent AI-driven Growth & Urban Farming System)** adalah sistem berbasis web yang mengintegrasikan **aplikasi monitoring hidroponik dengan teknologi Computer Vision berbasis YOLOv8** untuk membantu mengidentifikasi penyakit pada tanaman **lettuce (selada)**.
 
 Sistem ini terdiri dari dua komponen utama:
 
