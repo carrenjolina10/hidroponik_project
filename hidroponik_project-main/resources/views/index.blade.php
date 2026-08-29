@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Plant Monitoring Dashboard</title>
-    
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
     <link rel="icon" type="image/x-icon" href="{{ asset('image/bagus.ico') }}">
@@ -198,6 +198,59 @@
                 border-radius: 14px;
             }
         }
+
+        .dashboard-charts {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.chart-card {
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.chart-header {
+    margin-bottom: 20px;
+}
+
+.chart-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin-bottom: 5px;
+}
+
+.chart-header p {
+    font-size: 13px;
+    color: #718096;
+}
+
+.chart-container {
+    position: relative;
+    width: 100%;
+    height: 320px;
+}
+
+@media (max-width: 800px) {
+
+    .dashboard-charts {
+        gap: 16px;
+    }
+
+    .chart-card {
+        padding: 18px;
+    }
+
+    .chart-container {
+        height: 280px;
+    }
+}
     </style>
 </head>
 
@@ -218,32 +271,31 @@
         <nav>
 
             <a href="{{ route('index.index') }}" class="active">
+                    <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span>
+                    Dashboard
+                </a>
+                <a href="{{ route('data') }}">
+                    <span class="nav-icon"><i data-lucide="history"></i></span>
+                    History
+                </a>
+                <a href="{{ url('/ai') }}">
+                    <span class="nav-icon"><i data-lucide="scan-search"></i></span>
+                    AI Detection
+                </a>
+                <a href="{{ url('/control') }}" >
                 <span class="nav-icon">
-                    <i data-lucide="layout-dashboard"></i>
+                    <i data-lucide="sliders-horizontal"></i>
                 </span>
-                Dashboard
-            </a>
-
-            <a href="{{ route('index.create') }}">
-                <span class="nav-icon">
-                    <i data-lucide="file-plus-2"></i>
-                </span>
-                New Data
-            </a>
-
-            <a href="{{ route('data') }}">
-                <span class="nav-icon">
-                    <i data-lucide="history"></i>
-                </span>
-                History
-            </a>
-
-            <a href="{{ url('/ai') }}" >
-                <span class="nav-icon">
-                    <i data-lucide="scan-search"></i>
-                </span>
-                AI Detection
-            </a>
+                Control
+                </a>
+                <a href="{{ route('index.create') }}">
+                    <span class="nav-icon"><i data-lucide="file-plus-2"></i></span>
+                    New Data
+                </a>
+                <a href="{{ route('lettuce.guide') }}" >
+                    <span class="nav-icon"><i data-lucide="sprout"></i></span>
+                    Lettuce Guide
+                </a>
 
         </nav>
 
@@ -275,42 +327,71 @@
                 <div class="card fade-in delay-1">
                     <div class="card-icon"><i data-lucide="thermometer"></i></div>
                     <h3>Temperature</h3>
-                    <h2>28°C</h2>
-                    <div class="card-trend">↑ 2.3% from yesterday</div>
+                    <h2 id="cardTemperature">-°C</h2>
+                    <div class="card-trend" id="cardTemperatureTrend">-</div>
                 </div>
 
                 <div class="card fade-in delay-2">
                     <div class="card-icon"><i data-lucide="droplets"></i></div>
                     <h3>pH Water</h3>
-                    <h2>6.3</h2>
-                    <div class="card-trend" style="color: var(--warning);">↓ 0.1 from optimal</div>
+                    <h2 id="cardPh">-</h2>
+                    <div class="card-trend" id="cardPhTrend">-</div>
                 </div>
 
                 <div class="card fade-in delay-3">
                     <div class="card-icon"><i data-lucide="test-tube-diagonal"></i></div>
                     <h3>Nutrient</h3>
-                    <h2>1450 ppm</h2>
-                    <div class="card-trend" style="color: var(--danger);">↓ 5% below target</div>
+                    <h2 id="cardNutrient">- ppm</h2>
+                    <div class="card-trend" id="cardNutrientTrend">-</div>
                 </div>
 
                 <div class="card fade-in delay-4">
                     <div class="card-icon"><i data-lucide="heart-pulse"></i></div>
                     <h3>Health Score</h3>
-                    <h2>92%</h2>
-                    <div class="card-trend">↑ 3% this week</div>
-                </div>
-            </section>
-
-            <section class="content">
-                <div class="chart-card fade-in delay-2">
-                    <h3>Plant Growth Trend</h3>
-                    <div class="chart-wrapper">
-                        <canvas id="growthChart"></canvas>
-                    </div>
+                    <h2 id="cardHealth">-%</h2>
+                    <div class="card-trend" id="cardHealthTrend">-</div>
                 </div>
 
-                
             </section>
+
+            <section class="dashboard-charts">
+
+    <!-- HEALTH TREND -->
+    <div class="chart-card fade-in delay-4">
+
+        <div class="chart-header">
+            <div>
+                <h3>🌱 Plant Health Trend</h3>
+                <p>Perkembangan kesehatan tanaman berdasarkan histori sensor</p>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="healthTrendChart"></canvas>
+        </div>
+
+    </div>
+
+
+    <!-- SENSOR TREND -->
+    <div class="chart-card fade-in delay-4">
+
+        <div class="chart-header">
+            <div>
+                <h3>📊 Sensor Trend</h3>
+                <p>Perubahan parameter lingkungan dari waktu ke waktu</p>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="sensorTrendChart"></canvas>
+        </div>
+
+    </div>
+
+</section>
+
+            
 
             <section class="status-card fade-in delay-4">
                 <h3>Plant Status</h3>
@@ -336,103 +417,109 @@
 
     <script>
         // Chart configuration
-        const ctx = document.getElementById('growthChart').getContext('2d');
-        
-        // Create gradient
-        const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-        gradient.addColorStop(0, 'rgba(207, 236, 243, 0.6)');
-        gradient.addColorStop(1, 'rgba(207, 236, 243, 0.05)');
+        // Digantung dengan pengecekan: kalau elemen canvas #growthChart
+        // belum ada di halaman (mis. dihapus sementara), skip saja
+        // daripada melempar error dan menghentikan sisa script di bawahnya.
+        const chartEl = document.getElementById('growthChart');
+        if (chartEl) {
+            const ctx = chartEl.getContext('2d');
 
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                datasets: [{
-                    label: 'Growth Index',
-                    data: [55, 60, 66, 71, 78, 84, 89],
-                    borderColor: '#48bb78',
-                    backgroundColor: gradient,
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 6,
-                    pointBackgroundColor: '#ffffff',
-                    pointBorderColor: '#48bb78',
-                    pointBorderWidth: 3,
-                    pointHoverRadius: 8,
-                    pointHoverBackgroundColor: '#48bb78',
-                    pointHoverBorderColor: '#ffffff',
-                    pointHoverBorderWidth: 3
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(26, 26, 46, 0.9)',
-                        titleColor: '#ffffff',
-                        bodyColor: '#ffffff',
-                        padding: 12,
-                        cornerRadius: 8,
-                        displayColors: false,
-                        callbacks: {
-                            label: function(context) {
-                                return 'Growth: ' + context.parsed.y + '%';
+            // Create gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(207, 236, 243, 0.6)');
+            gradient.addColorStop(1, 'rgba(207, 236, 243, 0.05)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Growth Index',
+                        data: [55, 60, 66, 71, 78, 84, 89],
+                        borderColor: '#48bb78',
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 6,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: '#48bb78',
+                        pointBorderWidth: 3,
+                        pointHoverRadius: 8,
+                        pointHoverBackgroundColor: '#48bb78',
+                        pointHoverBorderColor: '#ffffff',
+                        pointHoverBorderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(26, 26, 46, 0.9)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            padding: 12,
+                            cornerRadius: 8,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Growth: ' + context.parsed.y + '%';
+                                }
                             }
                         }
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        min: 40,
-                        max: 100,
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)',
-                            drawBorder: false
-                        },
-                        ticks: {
-                            color: '#718096',
-                            font: {
-                                family: 'Inter',
-                                size: 12
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 40,
+                            max: 100,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)',
+                                drawBorder: false
                             },
-                            callback: function(value) {
-                                return value + '%';
+                            ticks: {
+                                color: '#718096',
+                                font: {
+                                    family: 'Inter',
+                                    size: 12
+                                },
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#718096',
+                                font: {
+                                    family: 'Inter',
+                                    size: 12
+                                }
                             }
                         }
                     },
-                    x: {
-                        grid: {
-                            display: false,
-                            drawBorder: false
-                        },
-                        ticks: {
-                            color: '#718096',
-                            font: {
-                                family: 'Inter',
-                                size: 12
-                            }
-                        }
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
                     }
-                },
-                interaction: {
-                    intersect: false,
-                    mode: 'index'
                 }
-            }
-        });
+            });
+        }
 
         // Apply suggestion button interaction
         function applySuggestion(btn) {
             btn.innerHTML = '✓ Applied!';
             btn.style.background = 'linear-gradient(135deg, #48bb78, #38a169)';
             btn.style.boxShadow = '0 4px 15px rgba(72, 187, 120, 0.4)';
-            
+
             setTimeout(() => {
                 btn.innerHTML = 'Apply Suggestion';
                 btn.style.background = '';
@@ -450,13 +537,17 @@
             });
         });
 
-        // Animate numbers on load
-        function animateValue(element, start, end, duration, suffix = '') {
+        // Satu-satunya definisi animateValue di seluruh file.
+        // Mendukung nilai desimal (mis. pH 6.30) lewat parameter `decimals`.
+        // Dipanggil oleh script Firebase di bawah setiap ada data baru,
+        // BUKAN oleh window 'load' dengan angka statis.
+        function animateValue(element, start, end, duration, suffix = '', decimals = 0) {
+            if (!element) return; // guard: elemen belum tentu ada di setiap halaman
             let startTimestamp = null;
             const step = (timestamp) => {
                 if (!startTimestamp) startTimestamp = timestamp;
                 const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-                const value = Math.floor(progress * (end - start) + start);
+                const value = (progress * (end - start) + start).toFixed(decimals);
                 element.innerHTML = value + suffix;
                 if (progress < 1) {
                     window.requestAnimationFrame(step);
@@ -464,23 +555,6 @@
             };
             window.requestAnimationFrame(step);
         }
-
-        // Trigger number animations after load
-        window.addEventListener('load', () => {
-            const cards = document.querySelectorAll('.card h2');
-            const values = [28, 6.3, 1450, 92];
-            const suffixes = ['°C', '', ' ppm', '%'];
-            
-            cards.forEach((card, index) => {
-                if (index === 1) { // pH value
-                    card.innerHTML = '6.3';
-                    return;
-                }
-                const endValue = values[index];
-                const suffix = suffixes[index];
-                animateValue(card, 0, endValue, 1500, suffix);
-            });
-        });
 
         (function () {
             const sidebar = document.getElementById('sidebar');
@@ -548,6 +622,547 @@
     <script>
         lucide.createIcons();
     </script>
+
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+    import {
+        getDatabase, ref, onValue
+    } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBedy4OHfbdi0jaBE2OrikqKbftqsnkvc0",
+        authDomain: "esp32-hydroponic.firebaseapp.com",
+        databaseURL: "https://esp32-hydroponic-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "esp32-hydroponic",
+        storageBucket: "esp32-hydroponic.firebasestorage.app",
+        messagingSenderId: "655265559145",
+        appId: "1:655265559145:web:7d0a0c0941d0877c8568f8"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const hydroRef = ref(db, "hydroponic");
+
+    // Rentang ideal untuk hitung Health Score & arah trend
+    const IDEAL = {
+        temp: { min: 22, max: 28 },
+        ph: { min: 5.8, max: 6.5 },
+        tds: { min: 1200, max: 1600 }
+    };
+
+    // Simpan nilai sebelumnya supaya bisa hitung trend naik/turun
+    let prev = { temp: null, ph: null, tds: null };
+
+    function trendHTML(current, previous, unit = '') {
+        if (previous === null || current === previous) {
+            return `<span style="color: var(--text-secondary, #718096);">→ stabil</span>`;
+        }
+        const diff = current - previous;
+        const arrow = diff > 0 ? '↑' : '↓';
+        const color = diff > 0 ? 'var(--success, #48bb78)' : 'var(--danger, #f56565)';
+        return `<span style="color:${color};">${arrow} ${Math.abs(diff).toFixed(2)}${unit} dari sebelumnya</span>`;
+    }
+
+    function statusTrendHTML(value, range, unitLabel) {
+        if (value < range.min) {
+            return `<span style="color: var(--danger, #f56565);">↓ di bawah optimal (${unitLabel})</span>`;
+        }
+        if (value > range.max) {
+            return `<span style="color: var(--warning, #ed8936);">↑ di atas optimal (${unitLabel})</span>`;
+        }
+        return `<span style="color: var(--success, #48bb78);">✓ optimal</span>`;
+    }
+
+    function calcHealthScore(temp, ph, tds) {
+        const score = (value, range) => {
+            if (value >= range.min && value <= range.max) return 100;
+            const distance = value < range.min ? range.min - value : value - range.max;
+            const span = (range.max - range.min) || 1;
+            return Math.max(0, 100 - (distance / span) * 100);
+        };
+        const tempScore = score(temp, IDEAL.temp);
+        const phScore = score(ph, IDEAL.ph);
+        const tdsScore = score(tds, IDEAL.tds);
+        return Math.round((tempScore + phScore + tdsScore) / 3);
+    }
+
+    onValue(hydroRef, (snapshot) => {
+        const data = snapshot.val();
+        if (!data || !data.sensor) return;
+
+        const temp = data.sensor.temperature;
+        const ph = data.sensor.phValue;
+        const tds = data.sensor.tdsValue;
+
+        // Catatan: baris-baris yang dulu mengisi #temperature, #phValue,
+        // #tdsValue, #totalRecords, dan #sensorTable SUDAH DIHAPUS dari
+        // sini karena elemen-elemen itu adalah milik halaman History
+        // (data.blade.php), bukan halaman Dashboard/index ini. Sebelumnya
+        // baris itu melempar error "Cannot set properties of null" yang
+        // menghentikan seluruh callback sebelum sempat mengisi card
+        // cardTemperature/cardPh/cardNutrient/cardHealth di bawah ini.
+
+        const healthScore = calcHealthScore(temp, ph, tds);
+
+        animateValue(document.getElementById('cardTemperature'), prev.temp ?? temp, temp, 800, '°C', 1);
+        animateValue(document.getElementById('cardPh'), prev.ph ?? ph, ph, 800, '', 2);
+        animateValue(document.getElementById('cardNutrient'), prev.tds ?? tds, tds, 800, ' ppm', 0);
+        animateValue(document.getElementById('cardHealth'), 0, healthScore, 800, '%', 0);
+
+        const tempTrendEl = document.getElementById('cardTemperatureTrend');
+        if (tempTrendEl) {
+            tempTrendEl.innerHTML =
+                prev.temp !== null ? trendHTML(temp, prev.temp, '°C') : statusTrendHTML(temp, IDEAL.temp, 'suhu');
+        }
+
+        const phTrendEl = document.getElementById('cardPhTrend');
+        if (phTrendEl) {
+            phTrendEl.innerHTML = statusTrendHTML(ph, IDEAL.ph, 'pH');
+        }
+
+        const nutrientTrendEl = document.getElementById('cardNutrientTrend');
+        if (nutrientTrendEl) {
+            nutrientTrendEl.innerHTML = statusTrendHTML(tds, IDEAL.tds, 'ppm');
+        }
+
+        const healthTrendEl = document.getElementById('cardHealthTrend');
+        if (healthTrendEl) {
+            healthTrendEl.innerHTML =
+                healthScore >= 80
+                    ? `<span style="color: var(--success, #48bb78);">↑ kondisi baik</span>`
+                    : `<span style="color: var(--warning, #ed8936);">↓ perlu perhatian</span>`;
+        }
+
+        // update nilai sebelumnya untuk perbandingan trend berikutnya
+        prev = { temp, ph, tds };
+    });
+    </script>
+
+    <script>
+
+const historyData = @json($histories);
+
+
+/*
+|--------------------------------------------------------------------------
+| IDEAL RANGE
+|--------------------------------------------------------------------------
+*/
+
+const IDEAL = {
+
+    temp: {
+        min: 22,
+        max: 28
+    },
+
+    ph: {
+        min: 5.8,
+        max: 6.5
+    },
+
+    tds: {
+        min: 1200,
+        max: 1600
+    }
+
+};
+
+
+/*
+|--------------------------------------------------------------------------
+| HITUNG SCORE PARAMETER
+|--------------------------------------------------------------------------
+*/
+
+function calculateParameterScore(value, range)
+{
+    if (value >= range.min && value <= range.max) {
+        return 100;
+    }
+
+    let distance;
+
+    if (value < range.min) {
+        distance = range.min - value;
+    } else {
+        distance = value - range.max;
+    }
+
+    const rangeSize = range.max - range.min;
+
+    return Math.max(
+        0,
+        100 - ((distance / rangeSize) * 100)
+    );
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| HITUNG HEALTH SCORE
+|--------------------------------------------------------------------------
+*/
+
+function calculateHealthScore(temp, ph, tds)
+{
+    const tempScore =
+        calculateParameterScore(temp, IDEAL.temp);
+
+    const phScore =
+        calculateParameterScore(ph, IDEAL.ph);
+
+    const tdsScore =
+        calculateParameterScore(tds, IDEAL.tds);
+
+    return Math.round(
+        (tempScore + phScore + tdsScore) / 3
+    );
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| PREPARE HISTORY
+|--------------------------------------------------------------------------
+*/
+
+const labels = [];
+
+const temperatureData = [];
+const phData = [];
+const nutrientData = [];
+const healthData = [];
+
+
+historyData.forEach(item => {
+
+    const temp = Number(item.suhu);
+    const ph = Number(item.pH);
+    const tds = Number(item.nutrisi);
+
+    labels.push(item.created_at);
+
+    temperatureData.push(temp);
+
+    phData.push(ph);
+
+    nutrientData.push(tds);
+
+    const health = calculateHealthScore(
+        temp,
+        ph,
+        tds
+    );
+
+    healthData.push(health);
+
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| HEALTH TREND CHART
+|--------------------------------------------------------------------------
+*/
+
+const healthCanvas =
+    document.getElementById('healthTrendChart');
+
+if (healthCanvas) {
+
+    new Chart(
+        healthCanvas,
+        {
+            type: 'line',
+
+            data: {
+
+                labels: labels,
+
+                datasets: [
+
+                    {
+                        label: 'Health Score',
+
+                        data: healthData,
+
+                        borderColor: '#48bb78',
+
+                        backgroundColor:
+                            'rgba(72, 187, 120, 0.12)',
+
+                        borderWidth: 3,
+
+                        fill: true,
+
+                        tension: 0.35,
+
+                        pointRadius: 4,
+
+                        pointHoverRadius: 7
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+
+                plugins: {
+
+                    legend: {
+                        display: false
+                    },
+
+                    tooltip: {
+
+                        callbacks: {
+
+                            label: function(context) {
+
+                                return 'Health: ' +
+                                    context.parsed.y +
+                                    '%';
+
+                            }
+
+                        }
+
+                    }
+
+                },
+
+                scales: {
+
+                    y: {
+
+                        min: 0,
+
+                        max: 100,
+
+                        ticks: {
+
+                            callback: function(value) {
+
+                                return value + '%';
+
+                            }
+
+                        }
+
+                    },
+
+                    x: {
+
+                        type: 'time',
+
+                        time: {
+
+                            unit: 'hour',
+
+                            tooltipFormat:
+                                'dd/MM/yyyy HH:mm'
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| SENSOR TREND CHART
+|--------------------------------------------------------------------------
+*/
+
+const sensorCanvas =
+    document.getElementById('sensorTrendChart');
+
+if (sensorCanvas) {
+
+    new Chart(
+        sensorCanvas,
+        {
+
+            type: 'line',
+
+            data: {
+
+                labels: labels,
+
+                datasets: [
+
+                    {
+                        label: 'Temperature (°C)',
+
+                        data: temperatureData,
+
+                        borderColor: '#f56565',
+
+                        backgroundColor:
+                            'transparent',
+
+                        borderWidth: 2,
+
+                        tension: 0.35,
+
+                        yAxisID: 'temperature'
+
+                    },
+
+                    {
+                        label: 'pH',
+
+                        data: phData,
+
+                        borderColor: '#4299e1',
+
+                        backgroundColor:
+                            'transparent',
+
+                        borderWidth: 2,
+
+                        tension: 0.35,
+
+                        yAxisID: 'ph'
+
+                    },
+
+                    {
+                        label: 'Nutrient (ppm)',
+
+                        data: nutrientData,
+
+                        borderColor: '#9f7aea',
+
+                        backgroundColor:
+                            'transparent',
+
+                        borderWidth: 2,
+
+                        tension: 0.35,
+
+                        yAxisID: 'nutrient'
+
+                    }
+
+                ]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: false,
+
+                interaction: {
+
+                    intersect: false,
+
+                    mode: 'index'
+
+                },
+
+                scales: {
+
+                    temperature: {
+
+                        type: 'linear',
+
+                        position: 'left',
+
+                        title: {
+
+                            display: true,
+
+                            text: 'Temperature °C'
+
+                        }
+
+                    },
+
+                    ph: {
+
+                        type: 'linear',
+
+                        position: 'right',
+
+                        min: 4,
+
+                        max: 8,
+
+                        title: {
+
+                            display: true,
+
+                            text: 'pH'
+
+                        },
+
+                        grid: {
+
+                            drawOnChartArea: false
+
+                        }
+
+                    },
+
+                    nutrient: {
+
+                        type: 'linear',
+
+                        position: 'right',
+
+                        display: false,
+
+                        min: 0
+
+                    },
+
+                    x: {
+
+                        type: 'time',
+
+                        time: {
+
+                            unit: 'hour',
+
+                            tooltipFormat:
+                                'dd/MM/yyyy HH:mm'
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+}
+
+</script>
 
 </body>
 </html>

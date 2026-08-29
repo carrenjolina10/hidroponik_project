@@ -16,10 +16,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
-        /* =========================
-           AI PAGE
-        ========================= */
-
+    
         .ai-content {
             display: grid;
             grid-template-columns: 1.2fr 0.8fr;
@@ -552,32 +549,32 @@
         <nav>
 
             <a href="{{ route('index.index') }}">
+                    <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span>
+                    Dashboard
+                </a>
+                <a href="{{ route('data') }}">
+                    <span class="nav-icon"><i data-lucide="history"></i></span>
+                    History
+                </a>
+                <a href="{{ url('/ai') }}" class="active">
+                    <span class="nav-icon"><i data-lucide="scan-search"></i></span>
+                    AI Detection
+                </a>
+                <a href="{{ url('/control') }}" >
                 <span class="nav-icon">
-                    <i data-lucide="layout-dashboard"></i>
+                    <i data-lucide="sliders-horizontal"></i>
                 </span>
-                Dashboard
-            </a>
+                Control
+                </a>
+                <a href="{{ route('index.create') }}">
+                    <span class="nav-icon"><i data-lucide="file-plus-2"></i></span>
+                    New Data
+                </a>
+                <a href="{{ route('lettuce.guide') }}" >
+                    <span class="nav-icon"><i data-lucide="sprout"></i></span>
+                    Lettuce Guide
+                </a>
 
-            <a href="{{ route('index.create') }}">
-                <span class="nav-icon">
-                    <i data-lucide="file-plus-2"></i>
-                </span>
-                New Data
-            </a>
-
-            <a href="{{ route('data') }}">
-                <span class="nav-icon">
-                    <i data-lucide="history"></i>
-                </span>
-                History
-            </a>
-
-            <a href="{{ url('/ai') }}" class="active">
-                <span class="nav-icon">
-                    <i data-lucide="scan-search"></i>
-                </span>
-                AI Detection
-            </a>
 
         </nav>
 

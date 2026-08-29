@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="icon" type="image/x-icon" href="{{ asset('image/bagus.ico') }}">
-
+<meta name="csrf-token" content="{{ csrf_token() }}">
     <style>
         :root {
             --primary: #CFECF3;
@@ -560,6 +560,92 @@
             color: var(--dark);
             margin-bottom: 0.5rem;
         }
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.record-control {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.7rem 1rem;
+    background: rgba(255, 255, 255, 0.75);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+}
+
+.record-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.record-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+.record-status {
+    font-size: 0.7rem;
+    color: var(--text-light);
+}
+
+.record-status.active {
+    color: var(--success);
+}
+
+.record-status.inactive {
+    color: var(--danger);
+}
+
+/* Toggle */
+
+.switch {
+    position: relative;
+    width: 48px;
+    height: 26px;
+    display: inline-block;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background: #cbd5e0;
+    border-radius: 50px;
+    transition: 0.3s;
+}
+
+.slider::before {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: 3px;
+    top: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: 0.3s;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.switch input:checked + .slider {
+    background: var(--success);
+}
+
+.switch input:checked + .slider::before {
+    transform: translateX(22px);
+}
 
         /* Animations */
         .fade-in {
@@ -720,33 +806,32 @@
 
         <nav>
 
-            <a href="{{ route('index.index') }}" >
+            <a href="{{ route('index.index') }}">
+                    <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span>
+                    Dashboard
+                </a>
+                <a href="{{ route('data') }}" class="active">
+                    <span class="nav-icon"><i data-lucide="history"></i></span>
+                    History
+                </a>
+                <a href="{{ url('/ai') }}">
+                    <span class="nav-icon"><i data-lucide="scan-search"></i></span>
+                    AI Detection
+                </a>
+                <a href="{{ url('/control') }}" >
                 <span class="nav-icon">
-                    <i data-lucide="layout-dashboard"></i>
+                    <i data-lucide="sliders-horizontal"></i>
                 </span>
-                Dashboard
-            </a>
-
-            <a href="{{ route('index.create') }}" >
-                <span class="nav-icon">
-                    <i data-lucide="file-plus-2"></i>
-                </span>
-                New Data
-            </a>
-
-            <a href="{{ route('data') }}" class="active">
-                <span class="nav-icon">
-                    <i data-lucide="history"></i>
-                </span>
-                History
-            </a>
-
-            <a href="{{ url('/ai') }}" >
-                <span class="nav-icon">
-                    <i data-lucide="scan-search"></i>
-                </span>
-                AI Detection
-            </a>
+                Control
+                </a>
+                <a href="{{ route('index.create') }}">
+                    <span class="nav-icon"><i data-lucide="file-plus-2"></i></span>
+                    New Data
+                </a>
+                <a href="{{ route('lettuce.guide') }}" >
+                    <span class="nav-icon"><i data-lucide="sprout"></i></span>
+                    Lettuce Guide
+                </a>
 
         </nav>
 
@@ -762,9 +847,32 @@
                     <h1>Data Monitoring</h1>
                     <p>Manage and review all sensor readings</p>
                 </div>
-                <a href="{{ route('index.create') }}" class="btn-add">
-                    <span>+</span> Add New Data
-                </a>
+                <div class="header-actions">
+
+                    <div class="record-control">
+
+                        <div class="record-info">
+                            <span class="record-label">
+                                Automatic Recording
+                            </span>
+
+                            <span class="record-status" id="recordStatus">
+                                Checking...
+                            </span>
+                        </div>
+
+                        <label class="switch">
+                            <input type="checkbox" id="recordToggle">
+                            <span class="slider"></span>
+                        </label>
+
+                    </div>
+
+                    <a href="{{ route('index.create') }}" class="btn-add">
+                        <span>+</span> Add New Data
+                    </a>
+
+                </div>
             </header>
 
             @if(session('success'))
@@ -827,13 +935,35 @@
                                 </tr>
                             </thead>
                             <tbody id="sensorTable">
-                                
+                                @forelse($histories as $h)
+                                    <tr>
+                                        <td><span class="id-badge">#{{ str_pad($h->id, 3, '0', STR_PAD_LEFT) }}</span></td>
+                                        <td>{{ number_format($h->suhu, 1) }} °C</td>
+                                        <td>{{ number_format($h->pH, 2) }}</td>
+                                        <td>{{ number_format($h->nutrisi, 0) }} ppm</td>
+                                        <td>
+                                            <span class="status-badge status-optimal">Recorded</span>
+                                        </td>
+                                        <td>{{ \Carbon\Carbon::parse($h->created_at)->format('d/m/Y, H:i:s') }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="empty-state">
+                                            <div class="empty-state-icon">📭</div>
+                                            <h3>Belum ada data history</h3>
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
+                        <div style="padding: 1rem 1.75rem;">
+                            {{ $histories->links() }}
+                        </div>
                 </div>
             </div>
         </main>
     </div>
+  
     <script>
     (function () {
         const sidebar = document.getElementById('sidebar');
@@ -894,80 +1024,297 @@
         }
     });
 
-
-
     lucide.createIcons();
 
-    
-        // Search functionality
-        document.getElementById('searchInput').addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            const rows = document.querySelectorAll('tbody tr');
-            
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(searchTerm) ? '' : 'none';
-            });
-        });
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const rows = document.querySelectorAll('tbody tr');
 
-        // Animate progress bars on load
-        window.addEventListener('load', () => {
-            document.querySelectorAll('.value-bar-fill').forEach(bar => {
-                const width = bar.style.width;
-                bar.style.width = '0';
-                setTimeout(() => {
-                    bar.style.width = width;
-                }, 300);
-            });
+        rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(searchTerm) ? '' : 'none';
         });
-    </script>
-<script>
-    lucide.createIcons();
-    </script>
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-    import {
-    getDatabase,ref,onValue
-    }
-    from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
-    const firebaseConfig = {
-    apiKey: "AIzaSyBedy4OHfbdi0jaBE2OrikqKbftqsnkvc0",
-    authDomain: "esp32-hydroponic.firebaseapp.com",
-    databaseURL:"https://esp32-hydroponic-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId:"esp32-hydroponic",
-    storageBucket:"esp32-hydroponic.firebasestorage.app",
-    messagingSenderId:"655265559145",
-    appId:"1:655265559145:web:7d0a0c0941d0877c8568f8"
-    };
+    });
 
-    const app=initializeApp(firebaseConfig);
-    const db=getDatabase(app);
-    const hydroRef=ref(db,"hydroponic");
-    onValue(hydroRef,(snapshot)=>{
-    const data=snapshot.val();
-    document.getElementById("temperature").innerHTML=
-    data.sensor.temperature.toFixed(1)+"°C";
-    document.getElementById("phValue").innerHTML=
-    data.sensor.phValue.toFixed(2);
-    document.getElementById("tdsValue").innerHTML=
-    data.sensor.tdsValue.toFixed(0);
-    document.getElementById("totalRecords").innerHTML="1";
-    document.getElementById("sensorTable").innerHTML=`
-        <tr>
-            <td><span class="id-badge">#001</span></td>
-            <td>${data.sensor.temperature.toFixed(1)} °C</td>
-            <td>${data.sensor.phValue.toFixed(2)}</td>
-            <td>${data.sensor.tdsValue.toFixed(0)} ppm</td>
-            <td>
-                <span class="status-badge status-optimal">
-                ${data.status.deviceOnline ? "Online" : "Offline"}
-                </span>
-            </td>
-            <td>${new Date().toLocaleString()}</td>
-            <td>-</td>
-         </tr>
-    `;
+    // Animate progress bars on load
+    window.addEventListener('load', () => {
+        document.querySelectorAll('.value-bar-fill').forEach(bar => {
+            const width = bar.style.width;
+            bar.style.width = '0';
+            setTimeout(() => {
+                bar.style.width = width;
+            }, 300);
+        });
     });
 </script>
+
+
+<script type="module">
+
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+
+    import {
+        getDatabase,
+        ref,
+        onValue,
+        set
+    } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
+
+
+    // ==========================================
+    // FIREBASE CONFIGURATION
+    // ==========================================
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBedy4OHfbdi0jaBE2OrikqKbftqsnkvc0",
+        authDomain: "esp32-hydroponic.firebaseapp.com",
+        databaseURL: "https://esp32-hydroponic-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "esp32-hydroponic",
+        storageBucket: "esp32-hydroponic.firebasestorage.app",
+        messagingSenderId: "655265559145",
+        appId: "1:655265559145:web:7d0a0c0941d0877c8568f8"
+    };
+
+
+    // ==========================================
+    // INITIALIZE FIREBASE
+    // ==========================================
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+
+    // ==========================================
+    // FIREBASE REFERENCES
+    // ==========================================
+
+    const hydroRef = ref(db, "hydroponic");
+    const recordingRef = ref(db, "hydroponic/recording/enabled");
+
+
+    // ==========================================
+    // ELEMENTS
+    // ==========================================
+
+    const recordToggle =
+        document.getElementById("recordToggle");
+
+    const recordStatus =
+        document.getElementById("recordStatus");
+
+    const temperatureElement =
+        document.getElementById("temperature");
+
+    const phElement =
+        document.getElementById("phValue");
+
+    const tdsElement =
+        document.getElementById("tdsValue");
+
+
+    // ==========================================
+    // DATA SENSOR TERAKHIR
+    // ==========================================
+
+    let latestSensorData = {
+        suhu: null,
+        pH: null,
+        nutrisi: null
+    };
+
+
+    // ==========================================
+    // REAL-TIME SENSOR DATA
+    // ==========================================
+
+    onValue(hydroRef, (snapshot) => {
+
+        const data = snapshot.val();
+
+        console.log("📡 Firebase data:", data);
+
+
+        // Tidak ada data Firebase
+        if (!data || !data.sensor) {
+
+            console.warn("❌ Sensor data tidak ditemukan.");
+
+            return;
+        }
+
+
+        // ======================================
+        // TEMPERATURE
+        // ======================================
+
+        if (data.sensor.temperature !== undefined) {
+
+            const temperature =
+                Number(data.sensor.temperature);
+
+            if (!isNaN(temperature)) {
+
+                // SIMPAN NILAI TERAKHIR
+                latestSensorData.suhu = temperature;
+
+                // Tampilkan ke dashboard
+                temperatureElement.innerHTML =
+                    temperature.toFixed(1) + "°C";
+            }
+        }
+
+
+        // ======================================
+        // pH
+        // ======================================
+
+        if (data.sensor.phValue !== undefined) {
+
+            const ph =
+                Number(data.sensor.phValue);
+
+            if (!isNaN(ph)) {
+
+                // SIMPAN NILAI TERAKHIR
+                latestSensorData.pH = ph;
+
+                // Tampilkan ke dashboard
+                phElement.innerHTML =
+                    ph.toFixed(2);
+            }
+        }
+
+
+        // ======================================
+        // TDS / NUTRIENT
+        // ======================================
+
+        if (data.sensor.tdsValue !== undefined) {
+
+            const tds =
+                Number(data.sensor.tdsValue);
+
+            if (!isNaN(tds)) {
+
+                // SIMPAN NILAI TERAKHIR
+                latestSensorData.nutrisi = tds;
+
+                // Tampilkan ke dashboard
+                tdsElement.innerHTML =
+                    tds.toFixed(0);
+            }
+        }
+
+
+        // ======================================
+        // CEK DATA TERAKHIR
+        // ======================================
+
+        console.log(
+            "📊 Latest Sensor Data:",
+            latestSensorData
+        );
+
+    });
+
+
+    // ==========================================
+    // RECORDING STATUS
+    // ==========================================
+
+    onValue(recordingRef, (snapshot) => {
+
+        const enabled =
+            snapshot.val() === true;
+
+
+        // Sinkronkan toggle
+        recordToggle.checked = enabled;
+
+
+        // Update status
+        if (enabled) {
+
+            recordStatus.textContent =
+                "Recording ON";
+
+            recordStatus.className =
+                "record-status active";
+
+        } else {
+
+            recordStatus.textContent =
+                "Recording OFF";
+
+            recordStatus.className =
+                "record-status inactive";
+        }
+
+
+        console.log(
+            "🎥 Recording status:",
+            enabled ? "ON" : "OFF"
+        );
+
+    });
+
+
+    // ==========================================
+    // AUTO RECORDING
+    // SETIAP 1 MENIT
+    // ==========================================
+
+
+
+    // ==========================================
+    // RECORDING TOGGLE
+    // ==========================================
+
+    recordToggle.addEventListener(
+        "change",
+        async function () {
+
+            const enabled =
+                this.checked;
+
+
+            try {
+
+                // Simpan status ke Firebase
+                await set(
+                    recordingRef,
+                    enabled
+                );
+
+
+                console.log(
+                    "🎥 Recording:",
+                    enabled
+                        ? "ON"
+                        : "OFF"
+                );
+
+
+            } catch (error) {
+
+                console.error(
+                    "❌ Recording error:",
+                    error
+                );
+
+
+                // Kembalikan toggle
+                this.checked =
+                    !enabled;
+            }
+
+        }
+    );
+
+</script>
+
+
+
 </body>
 </html>

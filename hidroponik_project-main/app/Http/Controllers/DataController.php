@@ -7,84 +7,111 @@ use Illuminate\Http\Request;
 
 class DataController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index(){
-        return view('index');
+    public function index()
+    {
+    $histories = Data::orderBy('created_at', 'asc')->get();
+
+    return view('index', compact('histories'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
-    {   return view('create');
-        
+    {
+        return view('create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        
+        $validated = $request->validate([
+            'idTumbuhan' => 'required|string|max:11',
+            'suhu' => 'required|numeric',
+            'pH' => 'required|numeric',
+            'nutrisi' => 'required|numeric',
+        ]);
+
+        Data::create($validated);
+
+        return redirect()
+            ->route('data')
+            ->with('success', 'Data berhasil ditambahkan!');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Data  $data
-     * @return \Illuminate\Http\Response
-     */
+    public function record(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'idTumbuhan' => 'required|string|max:11',
+                'suhu' => 'required|numeric',
+                'pH' => 'required|numeric',
+                'nutrisi' => 'required|numeric',
+            ]);
+
+            $data = Data::create([
+                'idTumbuhan' => $validated['idTumbuhan'],
+                'suhu' => $validated['suhu'],
+                'pH' => $validated['pH'],
+                'nutrisi' => $validated['nutrisi'],
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data berhasil disimpan',
+                'data' => $data
+            ], 201);
+
+        } catch (\Throwable $e) {
+
+            \Log::error('AUTO RECORD ERROR', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function show(Data $data)
     {
-        return view ('data', compact('data'));
+        return view('data', compact('data'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Data  $data
-     * @return \Illuminate\Http\Response
-     */
     public function edit(Data $data)
     {
-        //
+        return view('data', compact('data'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Data  $data
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, Data $data)
     {
-        //
+        $validated = $request->validate([
+            'idTumbuhan' => 'required|string|max:11',
+            'suhu' => 'required|numeric',
+            'pH' => 'required|numeric',
+            'nutrisi' => 'required|numeric',
+        ]);
+
+        $data->update($validated);
+
+        return redirect()
+            ->route('data')
+            ->with('success', 'Data berhasil diupdate!');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Data  $data
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Data $data)
     {
-         $data->delete();
+        $data->delete();
 
-        return redirect()->route('data')->with('success', 'Data berhasil dihapus!');
+        return redirect()
+            ->route('data')
+            ->with('success', 'Data berhasil dihapus!');
     }
 
-    public function data(){
-        return view('data');
+    public function data()
+    {
+        $histories = Data::orderByDesc('created_at')->paginate(20);
+
+        return view('data', compact('histories'));
     }
 }

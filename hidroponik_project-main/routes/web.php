@@ -4,6 +4,11 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DataController;
 use App\Http\Controllers\DiseaseDetectionController;
 
+
+
+Route::post('/data/record', [DataController::class, 'record'])
+    ->name('data.record');
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -24,3 +29,11 @@ Route::get('/ai', function () {
 })->name('ai');
 
 Route::post('/ai/predict', [App\Http\Controllers\AiController::class, 'predict'])->name('ai.predict');
+
+Route::get('/lettuce-guide', function () {
+    return view('lettuce-guide');
+})->name('lettuce.guide');
+
+Route::get('/control', function () {
+    return view('control');
+})->name('control');
