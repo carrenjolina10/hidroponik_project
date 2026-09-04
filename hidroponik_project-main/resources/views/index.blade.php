@@ -645,10 +645,22 @@
 
     // Rentang ideal untuk hitung Health Score & arah trend
     const IDEAL = {
-        temp: { min: 22, max: 28 },
-        ph: { min: 5.8, max: 6.5 },
-        tds: { min: 1200, max: 1600 }
-    };
+    temp: {
+        min: 18,
+        max: 24
+    },
+
+    ph: {
+        min: 5.5,
+        max: 6.5
+    },
+
+    tds: {
+        min: 560,
+        max: 840
+    }
+};
+
 
     // Simpan nilai sebelumnya supaya bisa hitung trend naik/turun
     let prev = { temp: null, ph: null, tds: null };
@@ -750,23 +762,22 @@ const historyData = @json($histories);
 */
 
 const IDEAL = {
-
     temp: {
-        min: 22,
-        max: 28
+        min: 18,
+        max: 24
     },
 
     ph: {
-        min: 5.8,
+        min: 5.5,
         max: 6.5
     },
 
     tds: {
-        min: 1200,
-        max: 1600
+        min: 560,
+        max: 840
     }
-
 };
+
 
 
 /*
