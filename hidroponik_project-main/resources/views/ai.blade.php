@@ -475,6 +475,7 @@
                 padding-left: 58px;
             }
 
+
             .header-text {
                 flex: 1 1 auto;
                 min-width: 0;
@@ -513,6 +514,219 @@
                 min-height: 260px;
             }
         }
+
+        /* ==============================
+   AI PREDICTION HISTORY
+   ============================== */
+
+.history-card {
+    background: white;
+    border-radius: 18px;
+    margin-bottom: 28px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.history-header {
+    padding: 26px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    border-bottom: 1px solid #edf2f7;
+}
+
+.history-title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.history-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: rgba(72, 187, 120, 0.12);
+    color: #48bb78;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.history-title h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #202236;
+}
+
+.history-title p {
+    margin: 4px 0 0;
+    color: #718096;
+    font-size: 13px;
+}
+
+.history-search-wrapper {
+    position: relative;
+    width: 310px;
+}
+
+.history-search-wrapper i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    color: #a0aec0;
+}
+
+.history-search-wrapper input {
+    width: 100%;
+    height: 46px;
+    padding: 0 16px 0 44px;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 13px;
+
+    font-size: 14px;
+    color: #2d3748;
+
+    outline: none;
+    box-sizing: border-box;
+}
+
+.history-search-wrapper input:focus {
+    border-color: #48bb78;
+    box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.1);
+}
+
+
+/* TABLE */
+
+.history-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.history-table thead {
+    background: #f4f7fa;
+}
+
+.history-table th {
+    padding: 17px 24px;
+
+    text-align: left;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    color: #718198;
+
+    letter-spacing: 0.5px;
+}
+
+.history-table td {
+    padding: 17px 24px;
+
+    border-bottom: 1px solid #edf2f7;
+
+    font-size: 14px;
+    color: #303448;
+}
+
+.history-table tbody tr {
+    transition: background 0.2s ease;
+}
+
+.history-table tbody tr:hover {
+    background: #fafcfd;
+}
+
+.history-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* PREDICTION BADGE */
+
+.prediction-badge {
+    display: inline-block;
+
+    padding: 6px 11px;
+
+    border-radius: 9px;
+
+    background: #eef8f1;
+    color: #38a169;
+
+    font-weight: 600;
+
+    text-transform: capitalize;
+}
+
+
+/* CONFIDENCE */
+
+.history-table .confidence-value {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+
+/* EMPTY STATE */
+
+.history-empty {
+    padding: 70px 20px;
+    text-align: center;
+}
+
+.history-empty i {
+    width: 42px;
+    height: 42px;
+
+    margin-bottom: 15px;
+
+    color: #a0aec0;
+}
+
+.history-empty h3 {
+    margin: 0 0 8px;
+
+    font-size: 20px;
+    color: #202236;
+}
+
+.history-empty p {
+    margin: 0;
+
+    font-size: 14px;
+    color: #8a94a6;
+}
+
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+
+    .history-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .history-search-wrapper {
+        width: 100%;
+    }
+
+    .history-table th,
+    .history-table td {
+        padding: 14px 16px;
+    }
+}
 
         @media (max-width: 480px) {
             .status-grid {
@@ -857,10 +1071,133 @@
 
         </section>
 
+        <!-- AI PREDICTION HISTORY -->
+<section class="history-card fade-in delay-4">
+
+    <div class="history-header">
+
+        <div class="history-title">
+
+            <div class="history-icon">
+                <i data-lucide="clipboard-list"></i>
+            </div>
+
+            <div>
+                <h3>All AI Predictions</h3>
+
+                <p>
+                    History of lettuce disease detection
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="history-search-wrapper">
+
+            <i data-lucide="search"></i>
+
+            <input
+                type="text"
+                id="predictionSearch"
+                placeholder="Search by ID or value..."
+            >
+
+        </div>
+
+    </div>
+
+
+    @if(isset($predictions) && $predictions->count() > 0)
+
+        <div class="history-table-wrapper">
+
+            <table class="history-table">
+
+                <thead>
+
+                    <tr>
+                        <th>ID</th>
+                        <th>IMAGE</th>
+                        <th>PREDICTION</th>
+                        <th>CONFIDENCE</th>
+                        <th>MODEL</th>
+                        <th>RECORDED</th>
+                    </tr>
+
+                </thead>
+
+
+                <tbody id="predictionTable">
+
+                    @foreach($predictions as $prediction)
+
+                        <tr>
+
+                            <td>
+                                {{ $prediction->id }}
+                            </td>
+
+                            <td>
+                                {{ $prediction->filename }}
+                            </td>
+
+                            <td>
+
+                                <span class="prediction-badge">
+                                    {{ str_replace('_', ' ', $prediction->prediction) }}
+                                </span>
+
+                            </td>
+
+                            <td>
+
+                                <span class="confidence-value">
+                                    {{ number_format($prediction->confidence * 100, 2) }}%
+                                </span>
+
+                            </td>
+
+                            <td>
+                                {{ $prediction->model }}
+                            </td>
+
+                            <td>
+                                {{ $prediction->created_at->format('d M Y, H:i') }}
+                            </td>
+
+                        </tr>
+
+                    @endforeach
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    @else
+
+        <div class="history-empty">
+
+            <i data-lucide="mail-open"></i>
+
+            <h3>Belum ada data history</h3>
+
+            <p>
+                Hasil analisis AI akan muncul di sini.
+            </p>
+
+        </div>
+
+    @endif
+
+</section>
+
 
         <!-- INFORMATION CARD -->
 
-        <section class="status-card fade-in delay-4">
+        <section class="status-card fade-in delay-5">
 
             <h3>
                 AI Detection Information

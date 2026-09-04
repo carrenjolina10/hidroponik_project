@@ -590,7 +590,7 @@
      FIREBASE
 ================================ -->
 
-```html
+
 <script type="module">
 
 import {
@@ -691,11 +691,7 @@ let dispenserBusy = {
 };
 
 
-/*
-|--------------------------------------------------------------------------
-| UPDATE MODE UI
-|--------------------------------------------------------------------------
-*/
+
 
 function updateModeUI(mode)
 {
@@ -1051,131 +1047,89 @@ const dispensers = [
 
 window.triggerDispenser = async function(dispenser, toggle)
 {
-    // Hanya bisa digunakan dalam mode MANUAL
+   const firebasePaths = {
+    phUp: "hydroponic/control/manualCommand/phUpPulse",
+    phDown: "hydroponic/control/manualCommand/phDownPulse",
+    mixA: "hydroponic/control/manualCommand/nutrisiAPulse",
+    mixB: "hydroponic/control/manualCommand/nutrisiBPulse"
+};
+
+window.triggerDispenser = async function(dispenser, toggle) {
+
     if (currentMode !== "manual") {
         toggle.checked = false;
         return;
     }
 
-    // Kalau user mencoba menyalakan
-    if (toggle.checked === true) {
+    const firebasePath = firebasePaths[dispenser];
+
+    if (!firebasePath) {
+        toggle.checked = false;
+        return;
+    }
+
+    // User menekan ON
+    if (toggle.checked) {
 
         try {
 
-            // Disable sementara supaya tidak bisa diklik berkali-kali
             toggle.disabled = true;
 
             statusMessage.innerText =
-                dispenser + " ON — dispensing...";
+                dispenser + " ON — menunggu ESP32...";
 
-            /*
-            |--------------------------------------------------------------------------
-            | 1. Firebase ON
-            |--------------------------------------------------------------------------
-            */
-
+            // Kirim pulse
             await set(
-                ref(
-                    db,
-                    "hydroponic/control/" + dispenser
-                ),
+                ref(db, firebasePath),
                 true
             );
 
-
-            /*
-            |--------------------------------------------------------------------------
-            | 2. Tunggu 1.5 detik
-            |--------------------------------------------------------------------------
-            */
-
-            await new Promise(resolve => {
-                setTimeout(resolve, 1500);
-            });
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | 3. Firebase OFF
-            |--------------------------------------------------------------------------
-            */
-
-            await set(
-                ref(
-                    db,
-                    "hydroponic/control/" + dispenser
-                ),
-                false
-            );
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | 4. Toggle OFF
-            |--------------------------------------------------------------------------
-            */
-
-            toggle.checked = false;
-
-            statusMessage.innerText =
-                dispenser + " OFF";
-
-
-        }
-        catch(error) {
-
-            console.error(
-                "Dispenser error:",
-                error
-            );
-
-            toggle.checked = false;
-
-            statusMessage.innerText =
-                "Gagal mengontrol " + dispenser;
-
-        }
-        finally {
-
-            /*
-            |--------------------------------------------------------------------------
-            | Aktifkan kembali toggle
-            |--------------------------------------------------------------------------
-            */
-
-            toggle.disabled = false;
-
-        }
-
-    }
-
-    // Kalau toggle dicoba di-OFF secara manual,
-    // kita paksa tetap OFF dan Firebase OFF.
-    else {
-
-        try {
-
-            await set(
-                ref(
-                    db,
-                    "hydroponic/control/" + dispenser
-                ),
-                false
-            );
-
-        }
-        catch(error) {
+        } catch (error) {
 
             console.error(error);
 
+            toggle.checked = false;
+            toggle.disabled = false;
+
+            statusMessage.innerText =
+                "Gagal mengirim perintah.";
+
         }
-
-        toggle.checked = false;
-
+        
     }
+};
 };
 
 
+onValue(
+    ref(db, "hydroponic/control/manualCommand"),
+    (snapshot) => {
+
+        const command = snapshot.val();
+
+        if (!command) return;
+
+        const states = {
+            phUp: command.phUpPulse === true,
+            phDown: command.phDownPulse === true,
+            mixA: command.nutrisiAPulse === true,
+            mixB: command.nutrisiBPulse === true
+        };
+
+        document.getElementById("phUpToggle").checked =
+            states.phUp;
+
+        document.getElementById("phDownToggle").checked =
+            states.phDown;
+
+        document.getElementById("mixAToggle").checked =
+            states.mixA;
+
+        document.getElementById("mixBToggle").checked =
+            states.mixB;
+
+    }
+);
 
 
 /*
