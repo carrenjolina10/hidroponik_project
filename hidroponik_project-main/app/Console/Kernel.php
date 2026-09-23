@@ -16,7 +16,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
     $schedule->command('sensor:record')
-        ->everyFifteenMinutes();
+        ->everyFiveMinutes()
+        ->appendOutputTo(storage_path('logs/sensor-record.log'));
     }
 
     /**

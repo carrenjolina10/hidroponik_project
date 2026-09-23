@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
 
     <link rel="icon" type="image/x-icon"
@@ -23,46 +23,184 @@
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
+        /* =========================================================
+           HARVEST-STYLE REDESIGN
+           Mandiri (tidak bergantung isi css/style.css eksternal untuk
+           bagian ini) supaya konsisten dengan halaman lain: sidebar
+           hijau tua + lime, kartu putih rounded, mobile drawer.
+        ========================================================= */
+        :root {
+            --primary: #c6f24e;
+            --secondary: #9be32e;
+            --bg: #eef3e9;
+            --card: #ffffff;
+            --dark: #0e2913;
+            --darker: #163a1c;
+            --text: #14251a;
+            --text-light: #7c8a80;
+            --line: #e7ede2;
+            --success: #48bb78;
+            --warning: #ed8936;
+            --danger: #f56565;
+            --radius: 18px;
+            --shadow: 0 1px 2px rgba(14, 41, 19, 0.05);
+            --shadow-hover: 0 10px 26px rgba(14, 41, 19, 0.10);
+        }
 
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            margin: 0;
+        }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--secondary); }
+
+        .bg-decoration { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+        .bg-decoration::before,
+        .bg-decoration::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.35;
+            filter: blur(90px);
+        }
+        .bg-decoration::before { width: 560px; height: 560px; background: var(--primary); top: -220px; right: -120px; }
+        .bg-decoration::after { width: 480px; height: 480px; background: var(--darker); bottom: -180px; left: -120px; }
+
+        .container { display: flex; min-height: 100vh; width: 100%; position: relative; z-index: 1; }
+
+        /* ---------------- SIDEBAR ---------------- */
+        .sidebar {
+            width: 260px;
+            background: var(--dark);
+            padding: 28px 20px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0; left: 0;
+            height: 100vh;
+            z-index: 100;
+        }
+
+        .sidebar img { max-width: 165px; margin-bottom: 2.25rem; }
+
+        .sidebar nav { display: flex; flex-direction: column; gap: 4px; }
+
+        .sidebar nav a {
+            text-decoration: none;
+            color: #b7c4b3;
+            padding: 12px 14px;
+            border-radius: 12px;
+            font-weight: 500;
+            font-size: 14.5px;
+            transition: background .15s ease, color .15s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .nav-icon { width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; opacity: .9; }
+        .nav-icon svg { width: 18px; height: 18px; }
+
+        .sidebar nav a:hover { background: rgba(255, 255, 255, 0.07); color: #eef3e9; }
+
+        .sidebar nav a.active {
+            background: var(--primary);
+            color: var(--dark);
+            font-weight: 700;
+            box-shadow: 0 4px 14px rgba(198, 242, 78, 0.25);
+        }
+
+        /* ---------------- MAIN ---------------- */
+        .main {
+            flex: 1;
+            margin-left: 260px;
+            padding: 26px 30px 34px;
+            width: 100%;
+            max-width: calc(100% - 260px);
+        }
+
+        /* ---------------- HEADER ---------------- */
+        .header {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 20px 26px;
+            margin-bottom: 22px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .header-text h1 { font-size: 1.55rem; font-weight: 800; color: var(--dark); letter-spacing: -0.3px; margin-bottom: 3px; }
+        .header-text p { font-size: 0.9rem; color: var(--text-light); }
+
+        .header-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 16px;
+            border-radius: 50px;
+            background: rgba(72, 187, 120, 0.12);
+            color: var(--success);
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .status-badge::before {
+            content: '';
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 0 0 rgba(72, 187, 120, 0.5);
+            animation: pulseDot 1.8s infinite;
+        }
+
+        @keyframes pulseDot {
+            0% { box-shadow: 0 0 0 0 rgba(72, 187, 120, 0.45); }
+            70% { box-shadow: 0 0 0 8px rgba(72, 187, 120, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(72, 187, 120, 0); }
+        }
+
+        /* ---------------- CONTROL CARDS ---------------- */
         .control-container {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 24px;
-            margin-top: 24px;
+            gap: 22px;
         }
 
         .control-card {
-            background: rgba(255,255,255,0.78);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.6);
-            border-radius: 20px;
-            padding: 28px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 26px;
+            box-shadow: var(--shadow);
         }
 
         .control-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 22px;
         }
 
-        .control-header h2 {
-            margin: 0;
-            font-size: 20px;
-            color: #1a202c;
-        }
+        .control-header h2 { margin: 0; font-size: 18px; color: var(--dark); font-weight: 800; }
+        .control-header p { margin-top: 5px; color: var(--text-light); font-size: 13px; }
 
-        .control-header p {
-            margin-top: 5px;
-            color: #718096;
-            font-size: 13px;
-        }
-
-        /* ==============================
-           MODE SELECTOR
-        ============================== */
-
+        /* ---------------- MODE SELECTOR ---------------- */
         .mode-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -74,33 +212,25 @@
             border-radius: 15px;
             padding: 18px;
             cursor: pointer;
-            background: #edf2f7;
-            color: #4a5568;
-            font-family: Inter, sans-serif;
+            background: var(--bg);
+            color: var(--text-light);
+            font-family: 'Plus Jakarta Sans', sans-serif;
             font-size: 15px;
             font-weight: 700;
             transition: all .2s ease;
         }
 
-        .mode-button:hover {
-            transform: translateY(-2px);
-        }
+        .mode-button:hover { transform: translateY(-2px); }
 
         .mode-button.active {
-            background: #48bb78;
-            color: white;
-            box-shadow: 0 5px 18px rgba(72,187,120,.3);
+            background: var(--dark);
+            color: var(--primary);
+            box-shadow: 0 5px 18px rgba(14, 41, 19, .3);
         }
 
-        .mode-icon {
-            display: block;
-            margin-bottom: 7px;
-        }
+        .mode-icon { display: block; margin-bottom: 7px; }
 
-        /* ==============================
-           DISPENSER
-        ============================== */
-
+        /* ---------------- DISPENSER ---------------- */
         .dispenser-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -108,17 +238,17 @@
         }
 
         .dispenser-card {
-            background: #f7fafc;
+            background: var(--bg);
             border-radius: 16px;
             padding: 22px;
-            border: 1px solid #edf2f7;
+            border: 1px solid var(--line);
             text-align: center;
             transition: all .2s ease;
         }
 
         .dispenser-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(0,0,0,.06);
+            box-shadow: var(--shadow-hover);
         }
 
         .dispenser-icon {
@@ -129,26 +259,14 @@
             align-items: center;
             justify-content: center;
             margin: 0 auto 14px;
-            background: #e6fffa;
-            color: #319795;
+            background: var(--primary);
+            color: var(--dark);
         }
 
-        .dispenser-card h3 {
-            margin: 0 0 5px;
-            font-size: 16px;
-            color: #1a202c;
-        }
+        .dispenser-card h3 { margin: 0 0 5px; font-size: 16px; color: var(--dark); font-weight: 700; }
+        .dispenser-card p { margin: 0 0 18px; font-size: 12px; color: var(--text-light); }
 
-        .dispenser-card p {
-            margin: 0 0 18px;
-            font-size: 12px;
-            color: #718096;
-        }
-
-        /* ==============================
-           TOGGLE
-        ============================== */
-
+        /* ---------------- TOGGLE ---------------- */
         .switch {
             position: relative;
             display: inline-block;
@@ -156,11 +274,7 @@
             height: 32px;
         }
 
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+        .switch input { opacity: 0; width: 0; height: 0; }
 
         .slider {
             position: absolute;
@@ -184,71 +298,120 @@
             box-shadow: 0 2px 5px rgba(0,0,0,.2);
         }
 
-        input:checked + .slider {
-            background: #48bb78;
-        }
+        input:checked + .slider { background: var(--primary); }
+        input:checked + .slider:before { transform: translateX(26px); }
 
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
+        .manual-disabled { opacity: .45; pointer-events: none; }
 
-        .manual-disabled {
-            opacity: .45;
-            pointer-events: none;
-        }
-
-        /* ==============================
-           STATUS
-        ============================== */
-
+        /* ---------------- STATUS ---------------- */
         .system-status {
             display: flex;
             align-items: center;
             gap: 10px;
             padding: 13px 16px;
             border-radius: 12px;
-            background: #f0fff4;
-            color: #276749;
+            background: rgba(72, 187, 120, 0.12);
+            color: var(--success);
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 700;
         }
 
         .status-dot {
             width: 9px;
             height: 9px;
             border-radius: 50%;
-            background: #48bb78;
+            background: var(--success);
         }
 
         .status-message {
             margin-top: 18px;
             min-height: 20px;
             font-size: 13px;
-            color: #718096;
+            color: var(--text-light);
         }
 
+        /* ---------------- MOBILE MENU ---------------- */
+        .mobile-menu-toggle {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            width: 42px; height: 42px;
+            border: none;
+            border-radius: 10px;
+            background: var(--dark);
+            color: var(--primary);
+            cursor: pointer;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(14, 41, 19, 0.25);
+        }
+
+        .mobile-menu-toggle:hover { background: var(--darker); }
+
         @media (max-width: 800px) {
+            .mobile-menu-toggle { position: fixed; top: 16px; left: 16px; z-index: 1001; }
+        }
 
-            .dispenser-grid {
-                grid-template-columns: repeat(2, 1fr);
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(14, 41, 19, 0.45);
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        .sidebar-overlay.active { display: block; opacity: 1; }
+
+        @media (max-width: 800px) {
+            .container,
+            .main,
+            .content,
+            .fade-in {
+                transform: none !important;
+                filter: none !important;
+                perspective: none !important;
+                will-change: auto !important;
             }
 
-            .control-card {
-                padding: 20px;
+            .container { display: block !important; }
+
+            .sidebar {
+                position: fixed !important;
+                top: 0 !important; left: 0 !important; bottom: 0 !important; right: auto !important;
+                width: 78vw !important;
+                max-width: 280px !important;
+                height: 100vh !important;
+                z-index: 99999 !important;
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                overflow-y: auto;
+                background: var(--dark) !important;
+                opacity: 1 !important;
+                backdrop-filter: none !important;
+                box-shadow: 6px 0 30px rgba(0, 0, 0, 0.35);
             }
+
+            .sidebar.active { transform: translateX(0); z-index: 99999 !important; }
+
+            .main { margin-left: 0 !important; width: 100% !important; max-width: 100% !important; padding: 18px 16px !important; }
+
+            .mobile-menu-toggle { display: flex; }
+
+            .header { padding: 16px 16px 16px 58px; }
+
+            .header-text h1 { font-size: 20px; }
+            .header-actions { width: 100%; }
+
+            .dispenser-grid { grid-template-columns: repeat(2, 1fr); }
+            .control-card { padding: 20px; }
         }
 
         @media (max-width: 480px) {
-
-            .dispenser-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .mode-container {
-                grid-template-columns: 1fr;
-            }
+            .dispenser-grid { grid-template-columns: 1fr; }
+            .mode-container { grid-template-columns: 1fr; }
+            .control-card { padding: 16px; border-radius: 14px; }
         }
-
     </style>
 
 </head>
@@ -257,13 +420,13 @@
 <body>
 
 <div class="bg-decoration"></div>
-
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <div class="container">
 
     <!-- SIDEBAR -->
 
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
 
         <img src="{{ asset('image/bagus_hidro_logo.png') }}"
              alt="Hidroponik BAGUS">
@@ -324,6 +487,15 @@
     <main class="main">
 
         <header class="header">
+
+            <button
+                type="button"
+                class="mobile-menu-toggle"
+                id="mobileMenuToggle"
+                aria-label="Buka menu"
+            >
+                <i data-lucide="menu"></i>
+            </button>
 
             <div class="header-text">
 
@@ -1203,10 +1375,74 @@ onValue(
 
 lucide.createIcons();
 
+/* =========================================================
+   MOBILE SIDEBAR TOGGLE
+   (tambahan baru, konsisten dengan halaman lain, tidak
+   mengubah logic Firebase/kontrol dispenser di atas)
+========================================================= */
+
+(function () {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    const container = document.querySelector('.container');
+    const mq = window.matchMedia('(max-width: 800px)');
+
+    function placeSidebar(e) {
+        if (e.matches) {
+            document.body.appendChild(sidebar);
+            document.body.appendChild(overlay);
+        } else {
+            container.insertBefore(sidebar, container.firstChild);
+        }
+    }
+
+    placeSidebar(mq);
+    mq.addEventListener('change', placeSidebar);
+})();
+
+const sidebarEl = document.getElementById('sidebar');
+const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+const sidebarOverlayEl = document.getElementById('sidebarOverlay');
+
+function openSidebar() {
+    sidebarEl.classList.add('active');
+    sidebarOverlayEl.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeSidebar() {
+    sidebarEl.classList.remove('active');
+    sidebarOverlayEl.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+mobileMenuToggle.addEventListener('click', function () {
+    if (sidebarEl.classList.contains('active')) {
+        closeSidebar();
+    } else {
+        openSidebar();
+    }
+});
+
+sidebarOverlayEl.addEventListener('click', closeSidebar);
+
+sidebarEl.querySelectorAll('nav a').forEach(function (link) {
+    link.addEventListener('click', function () {
+        if (window.innerWidth <= 800) {
+            closeSidebar();
+        }
+    });
+});
+
+window.addEventListener('resize', function () {
+    if (window.innerWidth > 800) {
+        closeSidebar();
+    }
+});
+
 </script>
 
 
 </body>
 
 </html>
-

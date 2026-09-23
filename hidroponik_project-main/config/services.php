@@ -31,4 +31,12 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'ai_service' => [
+        'url' => env('AI_SERVICE_URL', 'http://127.0.0.1:8000'),
+    ],
+
+    'firebase' => [
+        'sensor_url' => env('FIREBASE_SENSOR_URL'),
+    ],
+
 ];

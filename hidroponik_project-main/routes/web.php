@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\DataController;
-use App\Http\Controllers\DiseaseDetectionController;
 use App\Http\Controllers\AiController;
 
 
@@ -11,22 +10,13 @@ use App\Http\Controllers\AiController;
 Route::post('/data/record', [DataController::class, 'record'])
     ->name('data.record');
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [DataController::class, 'data'])
+    ->name('data');
 
 Route::resource('index', DataController::class);
 
 Route::get('/data', [DataController::class, 'data'])
     ->name('data');
-
-
-// Disease Detection
-Route::get('/disease-detection', [DiseaseDetectionController::class, 'index'])
-    ->name('disease.index');
-
-Route::post('/disease-detection/analyze', [DiseaseDetectionController::class, 'analyze'])
-    ->name('disease.analyze');
 
 
 // AI Prediction

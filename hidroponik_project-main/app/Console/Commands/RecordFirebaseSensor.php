@@ -16,7 +16,12 @@ class RecordFirebaseSensor extends Command
     {
         try {
 
-            $firebaseUrl = 'https://esp32-hydroponic-default-rtdb.asia-southeast1.firebasedatabase.app/hydroponic.json';
+            $firebaseUrl = config('services.firebase.sensor_url');
+
+            if (empty($firebaseUrl)) {
+                $this->error('FIREBASE_SENSOR_URL is not set in .env.');
+                return Command::FAILURE;
+            }
 
             $response = Http::timeout(10)->get($firebaseUrl);
 

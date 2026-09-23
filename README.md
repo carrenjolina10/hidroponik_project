@@ -1,499 +1,145 @@
-<<<<<<< HEAD
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# HIDROPONIK BAGUS
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**HIDROPONIK BAGUS (Biointelligent AI-driven Growth & Urban Farming System)** adalah sistem berbasis web yang mengintegrasikan monitoring hidroponik dengan Computer Vision berbasis YOLOv8 untuk membantu mengidentifikasi penyakit pada tanaman lettuce (selada).
 
-## About Laravel
+Sistem terdiri dari dua komponen utama:
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
-
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-=======
-# 🌱 HIDROPONIK BAGUS
-
-**HIDROPONIK BAGUS (Biointelligent AI-driven Growth & Urban Farming System)** adalah sistem berbasis web yang mengintegrasikan **aplikasi monitoring hidroponik dengan teknologi Computer Vision berbasis YOLOv8** untuk membantu mengidentifikasi penyakit pada tanaman **lettuce (selada)**.
-
-Sistem ini terdiri dari dua komponen utama:
-
-1. **Web Application** — dibangun menggunakan Laravel untuk menyediakan antarmuka pengguna dan pengelolaan sistem hidroponik.
-2. **AI Backend** — dibangun menggunakan Python dan YOLOv8 untuk melakukan analisis gambar dan klasifikasi penyakit pada lettuce.
-
-Selain menggunakan model YOLOv8, sistem menerapkan pendekatan tambahan berupa **cropped image** sebagai bagian dari preprocessing gambar sebelum dilakukan klasifikasi.
+1. **Web Application** (`hidroponik_project-main/`) — dibangun dengan Laravel, menangani antarmuka pengguna, autentikasi, pengelolaan data hidroponik, dan penyajian hasil prediksi.
+2. **AI Backend** (`backend_ai/`) — layanan FastAPI berbasis Python yang menjalankan pipeline deteksi + klasifikasi penyakit lettuce.
 
 ---
 
-# 📌 Project Overview
+## Arsitektur Sistem
 
-HIDROPONIK BAGUS dikembangkan sebagai sistem yang menggabungkan **hydroponic management** dan **AI-based plant disease classification** dalam satu platform.
-
-Secara umum, alur sistem adalah:
-
-```text
-                    USER
-                      │
-                      ▼
-              Laravel Web App
-                      │
-                      │ Image / Request
-                      ▼
-                AI Backend
-                  Python
-                      │
-                      ▼
-                 YOLOv8
-                      │
-              Image Processing
-                      │
-                Cropped Image
-                      │
-                      ▼
-             Disease Classification
-                      │
-                      ▼
-                AI Prediction
-                      │
-                      ▼
-                Laravel Web App
-                      │
-                      ▼
-               Result Display
+```
+USER
+  │
+  ▼
+Laravel Web App (port 8001)
+  │  HTTP request (gambar)
+  ▼
+AI Backend — FastAPI (port 8000)
+  │
+  ▼
+YOLOv8 (deteksi daun, crop area relevan)
+  │
+  ▼
+EfficientNet-B0 classifier (klasifikasi penyakit dari hasil crop)
+  │
+  ▼
+Prediction JSON
+  │
+  ▼
+Laravel Web App → ditampilkan ke user
 ```
 
-Sistem memungkinkan pengguna berinteraksi dengan aplikasi melalui web, sementara proses analisis penyakit tanaman dilakukan oleh backend AI.
+Laravel tidak menjalankan model AI secara langsung; proses inference dipisahkan ke backend Python agar kedua komponen bisa dikembangkan secara independen.
 
 ---
 
-# 🤖 Artificial Intelligence
+## AI Pipeline
 
-## YOLOv8
+Pipeline deteksi penyakit lettuce (`backend_ai/main.py`) bekerja dua tahap:
 
-Bagian AI pada project ini menggunakan **YOLOv8** sebagai model Computer Vision.
+1. **Deteksi (YOLOv8, `best_final.pt`)** — mendeteksi bounding box daun pada gambar yang diunggah, lalu mengambil box dengan confidence tertinggi. Jika tidak ada daun terdeteksi, seluruh gambar tetap diklasifikasi.
+2. **Klasifikasi (EfficientNet-B0, `best_lettuce_disease_model_final.pth`)** — hasil crop dari tahap 1 diklasifikasikan ke salah satu dari 7 kelas:
+   - Bacterial
+   - Downy mildew
+   - Powdery mildew
+   - Septoria blight
+   - Viral
+   - Wilt and leaf blight
+   - Healthy
 
-YOLOv8 digunakan untuk melakukan analisis terhadap gambar tanaman lettuce dan mengklasifikasikan kondisi penyakit berdasarkan model yang telah dilatih.
+Endpoint utama: `POST /predict` (menerima file gambar, mengembalikan kelas penyakit, confidence, dan probabilitas semua kelas).
 
-Model dikembangkan menggunakan dataset gambar lettuce yang memiliki beberapa kategori kondisi/penyakit.
-
-### Model
-
-Model AI disimpan pada folder:
-
-```text
-backend_ai/
-├── best_final.pt
-├── best_lettuce_disease_model_final.pth
-└── main.py
-```
-
-File model utama yang digunakan dalam proses inference berada di dalam folder `backend_ai`.
+Pendekatan crop-before-classify ini digunakan untuk mengurangi noise dari bagian gambar yang tidak relevan, sehingga classifier lebih fokus pada karakteristik visual daun.
 
 ---
 
-# 🔬 Cropped Image Method
+## Struktur Proyek
 
-Selain menggunakan model YOLOv8 secara langsung, project ini menggunakan pendekatan tambahan berupa **cropped image**.
-
-Tujuan pendekatan ini adalah untuk memfokuskan model terhadap **bagian tanaman yang relevan**, terutama area daun lettuce yang menjadi objek analisis.
-
-Secara sederhana, prosesnya:
-
-```text
-Original Image
-      │
-      ▼
-Image Preprocessing
-      │
-      ▼
-Crop Relevant Area
-      │
-      ▼
-Cropped Image
-      │
-      ▼
-YOLOv8
-      │
-      ▼
-Disease Classification
-      │
-      ▼
-Prediction Result
 ```
-
-Pendekatan cropping digunakan untuk mengurangi bagian gambar yang tidak relevan sehingga model dapat lebih fokus terhadap karakteristik visual yang berkaitan dengan penyakit tanaman.
-
----
-
-# 🧠 AI Pipeline
-
-Pipeline AI pada sistem secara umum terdiri dari beberapa tahap:
-
-### 1. Image Input
-
-Pengguna memberikan gambar lettuce melalui aplikasi.
-
-```text
-User → Image Upload
-```
-
-### 2. Image Preprocessing
-
-Gambar diproses sebelum diberikan kepada model.
-
-Salah satu metode yang digunakan adalah **cropped image**, yaitu mengambil area gambar yang relevan untuk analisis.
-
-### 3. YOLOv8 Inference
-
-Cropped image kemudian diberikan kepada model YOLOv8 yang telah dilatih.
-
-```text
-Cropped Image
-      ↓
-YOLOv8 Model
-      ↓
-Prediction
-```
-
-### 4. Disease Classification
-
-Model menghasilkan prediksi mengenai kondisi atau penyakit lettuce berdasarkan kelas yang tersedia pada dataset training.
-
-### 5. Result
-
-Hasil prediksi kemudian dikembalikan ke aplikasi untuk ditampilkan kepada pengguna.
-
----
-
-# 🖥️ Web Application
-
-Komponen web application berada pada:
-
-```text
-hidroponik_project-main/
-```
-
-Aplikasi web dibangun menggunakan **Laravel**.
-
-Laravel bertanggung jawab terhadap:
-
-* User interface
-* Routing
-* Request handling
-* Pengelolaan data
-* Integrasi dengan backend AI
-* Penyajian hasil prediksi
-* Pengelolaan fitur hidroponik
-
----
-
-# 🏗️ System Architecture
-
-Secara keseluruhan, sistem terdiri dari:
-
-```text
-┌──────────────────────────┐
-│          USER            │
-└────────────┬─────────────┘
-             │
-             ▼
-┌──────────────────────────┐
-│     Laravel Web App      │
-│                          │
-│  hidroponik_project-main │
-└────────────┬─────────────┘
-             │
-             │ Image / API Request
-             ▼
-┌──────────────────────────┐
-│       AI Backend         │
-│                          │
-│       Python             │
-│        main.py           │
-└────────────┬─────────────┘
-             │
-             ▼
-┌──────────────────────────┐
-│        YOLOv8            │
-│                          │
-│ Lettuce Disease Model    │
-└────────────┬─────────────┘
-             │
-             ▼
-┌──────────────────────────┐
-│    Disease Prediction    │
-└────────────┬─────────────┘
-             │
-             ▼
-┌──────────────────────────┐
-│     Laravel Web App      │
-│                          │
-│     Display Result       │
-└──────────────────────────┘
-```
-
-Dengan arsitektur tersebut, **Laravel tidak menjalankan model AI secara langsung sebagai bagian dari frontend**. Proses AI dipisahkan ke dalam backend Python sehingga komponen AI dan web dapat dikembangkan secara lebih modular.
-
----
-
-# 📂 Project Structure
-
-```text
-bagus_v2/
-│
+hidroponik_bagus/
 ├── backend_ai/
-│   ├── __pycache__/
-│   ├── best_final.pt
-│   ├── best_lettuce_disease_model_final.pth
-│   └── main.py
+│   ├── best_final.pt                        # YOLOv8 detector weights
+│   ├── best_lettuce_disease_model_final.pth # EfficientNet-B0 classifier weights
+│   ├── main.py                              # FastAPI service
+│   └── requirements.txt
 │
-└── hidroponik_project-main/
-    ├── app/
-    ├── bootstrap/
-    ├── config/
-    ├── database/
-    ├── lang/
-    ├── public/
-    ├── resources/
-    ├── routes/
-    ├── storage/
-    ├── tests/
-    ├── vendor/
-    │
-    ├── .env
-    ├── .env.example
-    ├── .gitignore
-    ├── artisan
-    ├── composer.json
-    ├── composer.lock
-    ├── package.json
-    ├── phpunit.xml
-    ├── README.md
-    └── vite.config.js
+├── hidroponik_project-main/                 # Laravel web app
+│   ├── app/
+│   ├── config/
+│   ├── database/
+│   ├── resources/
+│   ├── routes/
+│   └── ...
+│
+├── start-dev.bat                            # Starts MySQL, AI backend, Laravel, scheduler
+└── stop-dev.bat                             # Stops all of the above
 ```
 
 ---
 
-# 🛠️ Technologies
+## Menjalankan Secara Lokal (Windows)
 
-## Web Application
+Prasyarat:
+- XAMPP (untuk MySQL/MariaDB) — database `hidroponik`, user `hidroponik`
+- PHP 8.3 (path di skrip: `C:\php83\php.exe` — sesuaikan jika berbeda)
+- Python 3.x dengan virtualenv terisi di `backend_ai/venv/` (`pip install -r backend_ai/requirements.txt`)
+- Konfigurasi Firebase untuk logging data sensor (dipakai oleh Laravel scheduler)
 
-* **Laravel**
-* **PHP**
-* **HTML**
-* **CSS**
-* **JavaScript**
-* **Vite**
+Langkah:
 
-## Artificial Intelligence
+1. Salin `hidroponik_project-main/.env.example` ke `.env` dan isi kredensial database Anda.
+2. Isi `FIREBASE_SENSOR_URL` di `.env` dengan URL Firebase Realtime Database Anda (dipakai oleh scheduler untuk mengambil data sensor). `AI_SERVICE_URL` bisa dibiarkan default (`http://127.0.0.1:8000`) jika AI backend dijalankan secara lokal.
+3. Jalankan `start-dev.bat` dari root proyek. Ini akan:
+   - Menyalakan MySQL (XAMPP) jika belum berjalan
+   - Menyalakan AI backend di `http://127.0.0.1:8000` (FastAPI + YOLOv8, butuh ~20 detik untuk memuat model)
+   - Menyalakan Laravel di `http://127.0.0.1:8001`
+   - Menyalakan Laravel scheduler (mencatat data sensor dari Firebase setiap 1 menit — interval bisa diubah di `app/Console/Kernel.php`)
+4. Untuk menghentikan semua service, jalankan `stop-dev.bat`.
 
-* **Python**
-* **YOLOv8**
-* **Computer Vision**
-* **Image Cropping / Preprocessing**
-* **Deep Learning**
-
-## Development Tools
-
-* **Git**
-* **GitHub**
-* **Visual Studio Code**
+phpMyAdmin (jika Apache XAMPP aktif): `http://localhost/phpmyadmin`
 
 ---
 
+## Teknologi
 
-# 🔗 Integration Between Laravel and AI
+**Web Application:** Laravel, PHP, HTML, CSS, JavaScript, Vite
 
-Laravel berfungsi sebagai aplikasi utama yang menangani interaksi pengguna, sedangkan Python menangani proses inference AI.
+**Artificial Intelligence:** Python, FastAPI, YOLOv8 (Ultralytics), PyTorch/torchvision (EfficientNet-B0)
 
-Secara konsep:
-
-```text
-Laravel
-   │
-   │ HTTP Request
-   │
-   ▼
-Python AI Backend
-   │
-   ▼
-YOLOv8
-   │
-   ▼
-Prediction
-   │
-   ▼
-Python AI Backend
-   │
-   │ Response
-   ▼
-Laravel
-   │
-   ▼
-User
-```
-
-Pemisahan ini memungkinkan model AI dikembangkan atau diperbarui tanpa harus mengubah keseluruhan aplikasi Laravel.
+**Tools:** Git, GitHub, Visual Studio Code, XAMPP
 
 ---
 
-# 📊 AI Model
+## Status Pengembangan
 
-Model dilatih untuk mengenali penyakit pada tanaman lettuce berdasarkan karakteristik visual pada gambar.
+Sudah berjalan:
+- Deteksi + klasifikasi penyakit lettuce end-to-end (upload gambar → hasil prediksi)
+- Logging data sensor hidroponik (Firebase) ke database via scheduler
 
-Model yang tersedia pada project:
-
-```text
-backend_ai/
-├── best_final.pt
-└── best_lettuce_disease_model_final.pth
-```
-
-Model tersebut digunakan sebagai bagian dari pipeline AI untuk menghasilkan prediksi kondisi tanaman.
-
----
-
-# 🎯 Objectives
-
-Project ini memiliki beberapa tujuan utama:
-
-* Mengembangkan sistem digital untuk pengelolaan hidroponik.
-* Mengimplementasikan Computer Vision pada bidang pertanian.
-* Menggunakan YOLOv8 untuk klasifikasi penyakit lettuce.
-* Menguji penggunaan **cropped image** sebagai metode preprocessing tambahan.
-* Mengintegrasikan AI dengan aplikasi web Laravel.
-* Membuat sistem yang dapat membantu pengguna dalam mengidentifikasi kondisi tanaman berdasarkan gambar.
+Belum dikerjakan / rencana ke depan:
+- Real-time disease detection
+- Perluasan dataset dan data augmentation
+- Evaluasi performa model (precision, recall, mAP, confusion matrix)
+- Perbandingan performa dengan vs. tanpa cropped image
+- Sistem notifikasi penyakit tanaman
+- Penyimpanan riwayat hasil prediksi
+- Deployment AI backend dan web application
 
 ---
 
-# 🔮 Future Development
+## Kontributor
 
-Pengembangan selanjutnya dapat mencakup:
-
-* [ ] Real-time disease detection
-* [ ] Peningkatan dataset
-* [ ] Data augmentation
-* [ ] Evaluasi performa model menggunakan precision, recall, mAP, dan confusion matrix
-* [ ] Perbandingan performa dengan dan tanpa cropped image
-* [ ] Peningkatan akurasi model
-* [ ] Monitoring kondisi hidroponik secara real-time
-* [ ] Integrasi sensor IoT
-* [ ] Monitoring pH
-* [ ] Monitoring TDS
-* [ ] Monitoring suhu dan kelembapan
-* [ ] Sistem notifikasi penyakit tanaman
-* [ ] Penyimpanan riwayat hasil prediksi
-* [ ] Deployment AI backend
-* [ ] Deployment web application
+- Carrren Jolina
+- Dimas Aulia
+- Elora Nikita
+- Michael Vincent
 
 ---
 
-# 📈 Research / AI Development
+## Lisensi
 
-Salah satu fokus pengembangan project adalah mengevaluasi bagaimana **cropped image** dapat digunakan sebagai preprocessing tambahan dalam klasifikasi penyakit lettuce.
-
-Konsep evaluasinya:
-
-```text
-                 Dataset
-                    │
-          ┌─────────┴─────────┐
-          │                   │
-          ▼                   ▼
-     Original Image      Cropped Image
-          │                   │
-          ▼                   ▼
-       YOLOv8              YOLOv8
-          │                   │
-          ▼                   ▼
-     Prediction            Prediction
-          │                   │
-          └─────────┬─────────┘
-                    ▼
-             Performance
-              Comparison
-```
-
-
-
-## 👥 Contributors
-
-Project **HIDROPONIK BAGUS** dikembangkan sebagai project pengembangan aplikasi dan teknologi hidroponik.
-
-### Development Team
-* **Carrren Jolina**
-* **Dimas Aulia**
-* **Elora Nikita**
-* **Michael Vincent**
-
----
-
-## 📄 License
-
-Project ini dibuat untuk keperluan pembelajaran dan pengembangan aplikasi.
-
----
-
-<p align="center">
-  🌱 <strong>HIDROPONIK BAGUS</strong> 🌱
-  <br>
-  <i>Technology for Better Hydroponic Management</i>
-</p>
-
-
-</p>
->>>>>>> 868c1119813a08488bbcc71beaad9e22da035113
+Proyek ini dibuat untuk keperluan pembelajaran dan pengembangan aplikasi.
